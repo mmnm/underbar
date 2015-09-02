@@ -86,16 +86,41 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    var output_arr = [];
+    _.each(collection, function(item) {
+      if(test(item)) {
+        output_arr.push(item);
+      }
+    });
+    return output_arr;
+
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-  };
+     return _.filter(collection, function(item) {
+      if(test(item) === true) {
+        return false;
+      } else {
+        return true;
+      }});
+ 
+    };
+
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+    var hashMap = [];
+    return _.reject(array, function(item) {
+      if(item in hashMap) {
+        return true;
+      } else {
+        hashMap[item] = 1;
+        return false;
+      }
+    });
   };
 
 
@@ -104,6 +129,11 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var output_arr = [];
+    _.each(collection, function(item) {
+      output_arr.push(iterator(item));
+    });
+    return output_arr;
   };
 
   /*
@@ -145,6 +175,24 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    var isAccum = true;
+    if(typeof accumulator === "undefined") {
+      accumulator = collection[0];
+      isAccum = false;
+    }
+    if(!isAccum) {
+      collection = _.reject(collection, function(item) {
+        if(item === accumulator) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    }
+    _.each(collection, function(item) {
+      accumulator = iterator(accumulator, item);
+    });
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -163,12 +211,45 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if(typeof iterator === "undefined") {
+      iterator = function(item) {
+        if(item) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    return _.reduce(collection, function(wasTrue, item) {
+      if(wasTrue && iterator(item)) {
+        return true;
+      } else {
+        return false;
+      }
+    }, true)
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if(typeof iterator === "undefined") {
+      iterator = function(item) {
+        if(item) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+    var isSm = false;
+   _.each(collection, function(item) {
+    if(iterator(item)) {
+      isSm = true;
+    }
+   });
+   return isSm;
   };
 
 
