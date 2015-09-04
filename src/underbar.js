@@ -289,7 +289,22 @@ _.extend = function(obj1) {
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj) {
+  _.defaults = function(obj1) {
+    var obj2;
+    var len = arguments.length;
+    var k = 1;
+    while (len > 1) {
+      obj2 = arguments[k++];
+
+      _.each(obj2, function(item, i, obj2) {
+        if(!(i in obj1)) {
+          obj1[i] = obj2[i];
+        }
+      });
+      len--;
+    }
+
+    return obj1;
   };
 
 
@@ -333,6 +348,18 @@ _.extend = function(obj1) {
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var result = {};
+    var arg_list = [];
+    for(var i = 0; i < arguments.length; i++) {
+      arg_list.push(arguments[i]);
+    }
+   
+    return function() {
+      if(!(arg_list in result)) {
+        result[arg_list] = func.apply(this, arguments);
+      }
+      return result[arg_list];
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -342,6 +369,11 @@ _.extend = function(obj1) {
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+
+    var arg = arguments;
+    arg.splice(0,1);
+    setTimeout(func.apply(this, arg),3000);
+    
   };
 
 
@@ -356,6 +388,17 @@ _.extend = function(obj1) {
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var temp_arr = array;
+    //Math.floor((Math.random() * 10) + 1);
+    for (var i = temp_arr.length - 1; i > 0; i--) {
+      var j = Math.floor((Math.random() * i) + 0);
+      //swap i and j
+      var temp = temp_arr[i];
+      temp_arr[i] = temp_arr[j];
+      temp_arr[j] = temp;
+
+    };
+    return temp_arr;
   };
 
 
@@ -392,6 +435,15 @@ _.extend = function(obj1) {
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    var result = [];
+    result =  _.reduce(nestedArray, function(result, item) {
+      if(Array.isArray(item)) {
+        return result.concat(_.flatten(item, result));
+      } else {
+        return result.concat(item);
+      }
+    }, result);
+    return result;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
