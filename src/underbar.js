@@ -349,16 +349,20 @@ _.extend = function(obj1) {
   // instead if possible.
   _.memoize = function(func) {
     var result = {};
+    /*
     var arg_list = [];
     for(var i = 0; i < arguments.length; i++) {
       arg_list.push(arguments[i]);
-    }
+    }*/
+    var slice = Array.prototype.slice;
+
    
     return function() {
-      if(!(arg_list in result)) {
-        result[arg_list] = func.apply(this, arguments);
+      var args = slice.call(arguments); 
+      if(!(args in result)) {
+        result[args] = func.apply(this, arguments);
       }
-      return result[arg_list];
+      return result[args];
     }
   };
 
@@ -369,10 +373,12 @@ _.extend = function(obj1) {
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
-
-    var arg = arguments;
-    arg.splice(0,1);
-    setTimeout(func.apply(this, arg),3000);
+    var slice = Array.prototype.slice;
+    var args = slice.call(arguments);
+    args.shift();
+    args.shift();
+  
+    setTimeout(function() { func.apply(this, args) }, wait);
     
   };
 
@@ -388,7 +394,7 @@ _.extend = function(obj1) {
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
-    var temp_arr = array;
+    var temp_arr = array.slice();
     //Math.floor((Math.random() * 10) + 1);
     for (var i = temp_arr.length - 1; i > 0; i--) {
       var j = Math.floor((Math.random() * i) + 0);
